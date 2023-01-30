@@ -1,7 +1,7 @@
 node {
 
     //Define all variables
-    def appName = 'hello_world' 
+    def appName = 'num_guess' 
     def imageTag = "meir215/${appName}"
     def buildnum = "1.0.${env.BUILD_NUMBER}"
 
