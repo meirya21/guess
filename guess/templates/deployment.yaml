@@ -42,7 +42,8 @@ spec:
               path: /
               port: http
           readinessProbe:
-            httpGet:
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            httpGet: 
               path: /
               port: http
           resources:

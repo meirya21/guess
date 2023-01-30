@@ -14,6 +14,8 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+initialDelaySeconds: 30
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -42,7 +44,7 @@ service:
   port: 5000
   targetPort: 8000
 
-ingress:
+ingress: {}
   enabled: false
   className: ""
   annotations: {}
