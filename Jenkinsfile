@@ -43,21 +43,17 @@ node {
     
     stage("Commit") {
         env.BRANCH_NAME == 'master'
-        steps {
             sh '''
             git changelog: false, credentialsId: 'git', poll: false, url: 'https://github.com/meirya21/guess.git'
             git add . && git commit -am "[Jenkins CI] guess/valus.yaml"
                 '''
         }
-    }
 
     stage("Push") {
         env.BRANCH_NAME == 'master'
-        steps {
             sh '''
             git config --local credential.helper "!f() { echo username=$GIT_AUTH_USR; echo password=$GIT_AUTH_PSW; }; f"
             git push origin master -f 
             '''
-        }
     }
 }
