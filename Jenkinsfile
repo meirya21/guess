@@ -27,3 +27,4 @@ node {
         sh("docker push ${imageTag}:latest")
         }
     }
+}
