@@ -1,58 +1,33 @@
-//Define all variables
-def appName = 'num_guess' 
-def imageTag = "meir215/${appName}"
-def buildnum = "1.0.${env.BUILD_NUMBER}"
+node {
+    // Define all variables
+    def appName = 'num_guess' 
+    def imageTag = "meir215/${appName}"
+    def buildnum = "1.0.${env.BUILD_NUMBER}"
+    def dockerImage
 
-//Checkout Code from Git
-checkout scm
+    // Checkout Code from Git
+    checkout scm
 
-pipeline {
-  agent {
-    kubernetes {
-      yaml '''
-        apiVersion: v1
-        kind: Pod
-        spec:
-          containers:
-          - name: docker
-            image: docker:latest
-            command:
-            - cat
-            tty: true
-            volumeMounts:
-             - mountPath: /var/run/docker.sock
-               name: docker-sock
-          volumes:
-          - name: docker-sock
-            hostPath:
-              path: /var/run/docker.sock    
-        '''
-    }
-  }
-  stages {
-  
-    //master : Build the docker image.
+    // Build the docker image
     stage('Build image') {
-        env.BRANCH_NAME == 'master'
-        steps {
-            container('docker') {
-                dockerImage = docker.build("${imageTag}:${buildnum}")
+        if (env.BRANCH_NAME == 'master') {
+            dockerImage = docker.build("${imageTag}:${buildnum}")
+        }
+    }
+
+    // E2E testing
+    stage('E2E testing') {
+        if (env.BRANCH_NAME == 'master') {
+            sh 'echo test'
+        }
+    }
+
+    // Push the image to dockerhub
+    stage('Push image to registry') {
+        if (env.BRANCH_NAME == 'master') {
+            withDockerRegistry([ credentialsId: "docker", url: "https://hub.docker.com/repository/docker/meir215/guess" ]) {
+                dockerImage.push()
             }
         }
     }
-    
-    //master : E2E testing
-    stage('E2E testing') {
-        env.BRANCH_NAME == 'master'
-        sh 'echo test'
-        }
-
-    //master : Push the image to dockerhub
-    stage('Push image to registry') {
-        env.BRANCH_NAME == 'master'
-        withDockerRegistry([ credentialsId: "docker", url: "" ]) {
-        dockerImage.push()
-        }
-    }
-  }
 }
