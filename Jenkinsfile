@@ -1,3 +1,8 @@
+//Define all variables
+def appName = 'num_guess' 
+def imageTag = "meir215/${appName}"
+def buildnum = "1.0.${env.BUILD_NUMBER}"
+
 pipeline {
   agent {
     kubernetes {
@@ -21,11 +26,6 @@ pipeline {
         '''
     }
   }
-
-    //Define all variables
-    def appName = 'num_guess' 
-    def imageTag = "meir215/${appName}"
-    def buildnum = "1.0.${env.BUILD_NUMBER}"
 
     //Checkout Code from Git
     checkout scm
