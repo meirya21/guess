@@ -1,53 +1,30 @@
-pipeline {
-    agent any
+node {
 
-    environment {
-        APP_NAME = 'num_guess'
-        IMAGE_TAG = "meir215/${APP_NAME}"
-        BUILD_VERSION = "1.0.${BUILD_NUMBER}"
-        DOCKER_REGISTRY_URL = 'https://hub.docker.com/repository/docker/meir215/guess'
-    }
+    //Define all variables
+    def appName = 'num_guess' 
+    def imageTag = "meir215/${appName}"
+    def buildnum = "1.0.${env.BUILD_NUMBER}"
 
-    stages {
-        stage('Install Docker') {
-            steps {
-            sh 'sudo apt-get update'
-            sh 'sudo apt-get install -y docker.io'
-            }
-    }
-
-        stage('Build Docker image') {
-            when {
-                branch 'master'
-            }
-            steps {
-                script {
-                    def dockerImage = docker.build("${IMAGE_TAG}:${BUILD_VERSION}")
-                    dockerImage.push()
-                }
-            }
+    //Checkout Code from Git
+    checkout scm
+  
+    //master : Build the docker image.
+    stage('Build image') {
+        env.BRANCH_NAME == 'master'
+        sh("docker build . -t ${imageTag}:${buildnum}")
+        }
+    
+    //master : E2E testing
+    stage('E2E testing') {
+        env.BRANCH_NAME == 'master'
+         sh 'echo test'
         }
 
-        stage('E2E testing') {
-            when {
-                branch 'master'
-            }
-            steps {
-                sh 'echo test'
-            }
-        }
-
-        stage('Push Docker image') {
-            when {
-                branch 'master'
-            }
-            steps {
-                script {
-                    withDockerRegistry([ credentialsId: "docker", url: DOCKER_REGISTRY_URL ]) {
-                        dockerImage.push()
-                    }
-                }
-            }
+    //master : Push the image to dockerhub
+    stage('Push image to registry') {
+        env.BRANCH_NAME == 'master'
+        withDockerRegistry([ credentialsId: "docker", url: "" ]) {
+        sh("docker push ${imageTag}:${buildnum}")
         }
     }
 }
