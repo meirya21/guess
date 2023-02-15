@@ -11,7 +11,7 @@ node {
     //master : Build the docker image.
     stage('Build image') {
         env.BRANCH_NAME == 'master'
-        sh ("sudo usermod -a -G docker jenkins")
+        sh ("usermod -a -G docker jenkins")
         sh("docker build . -t ${imageTag}:${buildnum}")
         }
     
