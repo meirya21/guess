@@ -1,39 +1,53 @@
-node {
-    // Define all variables
-    def appName = 'num_guess' 
-    def imageTag = "meir215/${appName}"
-    def buildnum = "1.0.${env.BUILD_NUMBER}"
-    def dockerImage
+pipeline {
+    agent any
 
-    // Checkout Code from Git
-    checkout scm
-    
-    stage('Install Docker') {
-        steps {
-            sh 'curl -fsSL https://get.docker.com -o get-docker.sh'
-            sh 'sh get-docker.sh'
-        }
+    environment {
+        APP_NAME = 'num_guess'
+        IMAGE_TAG = "meir215/${APP_NAME}"
+        BUILD_NUMBER = env.BUILD_NUMBER
+        BUILD_VERSION = "1.0.${BUILD_NUMBER}"
+        DOCKER_REGISTRY_URL = 'https://hub.docker.com/repository/docker/meir215/guess'
     }
 
-    // Build the docker image
-    stage('Build image') {
-        if (env.BRANCH_NAME == 'master') {
-            dockerImage = docker.build("${imageTag}:${buildnum}")
+    stages {
+        stage('Install Docker') {
+            steps {
+                sh 'curl -fsSL https://get.docker.com -o get-docker.sh'
+                sh 'sh get-docker.sh'
+            }
         }
-    }
 
-    // E2E testing
-    stage('E2E testing') {
-        if (env.BRANCH_NAME == 'master') {
-            sh 'echo test'
+        stage('Build Docker image') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    def dockerImage = docker.build("${IMAGE_TAG}:${BUILD_VERSION}")
+                    dockerImage.push()
+                }
+            }
         }
-    }
 
-    // Push the image to dockerhub
-    stage('Push image to registry') {
-        if (env.BRANCH_NAME == 'master') {
-            withDockerRegistry([ credentialsId: "docker", url: "https://hub.docker.com/repository/docker/meir215/guess" ]) {
-                dockerImage.push()
+        stage('E2E testing') {
+            when {
+                branch 'master'
+            }
+            steps {
+                sh 'echo test'
+            }
+        }
+
+        stage('Push Docker image') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    withDockerRegistry([ credentialsId: "docker", url: DOCKER_REGISTRY_URL ]) {
+                        dockerImage.push()
+                    }
+                }
             }
         }
     }
