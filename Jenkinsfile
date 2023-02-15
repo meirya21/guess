@@ -11,7 +11,7 @@ node {
     //master : Build the docker image.
     stage('Build image') {
         env.BRANCH_NAME == 'master'
-        sh("docker build . -t ${imageTag}:latest")
+        sh("docker build . -t ${imageTag}:${buildnum}")
         }
     
     //master : E2E testing
@@ -24,7 +24,7 @@ node {
     stage('Push image to registry') {
         env.BRANCH_NAME == 'master'
         withDockerRegistry([ credentialsId: "docker", url: "" ]) {
-        sh("docker push ${imageTag}:latest")
+        sh("docker push ${imageTag}:${buildnum}")
         }
     }
 }
