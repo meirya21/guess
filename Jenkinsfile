@@ -3,6 +3,9 @@ def appName = 'num_guess'
 def imageTag = "meir215/${appName}"
 def buildnum = "1.0.${env.BUILD_NUMBER}"
 
+//Checkout Code from Git
+checkout scm
+
 pipeline {
   agent {
     kubernetes {
@@ -27,9 +30,6 @@ pipeline {
     }
   }
   stages {
-
-    //Checkout Code from Git
-    checkout scm
   
     //master : Build the docker image.
     stage('Build image') {
