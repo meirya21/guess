@@ -4,7 +4,6 @@ pipeline {
     environment {
         APP_NAME = 'num_guess'
         IMAGE_TAG = "meir215/${APP_NAME}"
-        BUILD_NUMBER = env.BUILD_NUMBER
         BUILD_VERSION = "1.0.${BUILD_NUMBER}"
         DOCKER_REGISTRY_URL = 'https://hub.docker.com/repository/docker/meir215/guess'
     }
