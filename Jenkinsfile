@@ -9,10 +9,13 @@ node {
     checkout scm
   
     //master : Build the docker image.
-    stage('Build image') {
+    stage('Build image') 
+         agent {
+                docker {
         env.BRANCH_NAME == 'master'
         def dockerImage = docker.build("${imageTag}:${buildnum}")
-        }
+                }
+         }
     
     //master : E2E testing
     stage('E2E testing') {
