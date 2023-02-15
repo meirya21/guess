@@ -26,6 +26,7 @@ pipeline {
         '''
     }
   }
+  stages {
 
     //Checkout Code from Git
     checkout scm
@@ -53,4 +54,5 @@ pipeline {
         dockerImage.push()
         }
     }
+  }
 }
