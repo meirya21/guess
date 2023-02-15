@@ -10,11 +10,9 @@ pipeline {
 
     stages {
         stage('Install Docker') {
-            steps {
-                sh 'curl -fsSL https://get.docker.com -o get-docker.sh'
-                sh 'sh get-docker.sh'
-            }
-        }
+            sh 'sudo apt-get update'
+            sh 'sudo apt-get install -y docker.io'
+    }
 
         stage('Build Docker image') {
             when {
