@@ -11,7 +11,9 @@ node {
     //master : Build the docker image.
     stage('Build image') {
         env.BRANCH_NAME == 'master'
+        container('docker') {
         def dockerImage = docker.build("${imageTag}:${buildnum}")
+        }
     }
     
     //master : E2E testing
